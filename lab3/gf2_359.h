@@ -22,7 +22,7 @@ public:
     GF2_359 operator*(const GF2_359& other) const;
     GF2_359& operator*=(const GF2_359& other);
     GF2_359 square() const;
-    GF2_359 pow(uint64_t e) const;
+    GF2_359 pow(const GF2_359& e) const;
     GF2_359 inverse() const;
 
     bool operator==(const GF2_359& other) const;

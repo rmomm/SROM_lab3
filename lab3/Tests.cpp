@@ -26,11 +26,15 @@ void TestGF2m() {
     R = A.square();
     cout << "A^2 = " << R.toHex() << endl;
 
-    R = A.pow(5);
-    cout << "A^5 = " << R.toHex() << endl;
+    GF2_359 A_pow_C = A.pow(C);
+    GF2_359 A_inv = A.inverse();
+    GF2_359 check = A * A_inv;
 
-    R = A.inverse();
-    cout << "A^-1 = " << R.toHex() << endl;
+    cout << "A^C   = " << A_pow_C.toHex() << "\n";
+    cout << "A^-1  = " << A_inv.toHex() << "\n";
+    cout << "A*A^-1= " << check.toHex() << "\n";
+
+
 
     R = (A + B) * C;
     GF2_359 rhs = A * C + B * C;
@@ -38,6 +42,7 @@ void TestGF2m() {
     cout << "A*C + B*C = " << rhs.toHex() << endl;
     cout << "Distributive law holds? " << (R == rhs ? "YES" : "NO") << endl;
 }
+
 
 void BenchmarkGF2m() {
     const int iter = 1000;
@@ -63,7 +68,7 @@ void BenchmarkGF2m() {
     bench("add", [&]() { R = A + B; });
     bench("mul", [&]() { R = A * B; });
     bench("square", [&]() { R = A.square(); });
-    bench("pow 5", [&]() { R = A.pow(5); });
+    //bench("pow 5", [&]() { R = A.pow(5); });
     bench("inverse", [&]() { R = A.inverse(); });
 
 }
