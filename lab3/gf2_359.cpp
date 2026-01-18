@@ -44,10 +44,7 @@ bool GF2_359::isOne(const vector<uint64_t>& a) {
     return a.size() == 1 && a[0] == 1;
 }
 
-vector<uint64_t> GF2_359::xorPoly(
-    const vector<uint64_t>& a,
-    const vector<uint64_t>& b
-) {
+vector<uint64_t> GF2_359::xorPoly( const vector<uint64_t>& a, const vector<uint64_t>& b) {
     vector<uint64_t> r(max(a.size(), b.size()), 0);
     for (size_t i = 0; i < a.size(); ++i) r[i] ^= a[i];
     for (size_t i = 0; i < b.size(); ++i) r[i] ^= b[i];
@@ -75,12 +72,7 @@ vector<uint64_t> GF2_359::shiftLeft(
 }
 
 
-void GF2_359::divMod(
-    const vector<uint64_t>& a,
-    const vector<uint64_t>& b,
-    vector<uint64_t>& q,
-    vector<uint64_t>& r
-) {
+void GF2_359::divMod(const vector<uint64_t>& a, const vector<uint64_t>& b, vector<uint64_t>& q,vector<uint64_t>& r) {
     r = a;
     q.clear();
 
@@ -116,10 +108,7 @@ static int lowestBit(uint64_t w) {
 }
 
 
-vector<uint64_t> GF2_359::mulPoly(
-    const vector<uint64_t>& a,
-    const vector<uint64_t>& b
-) {
+vector<uint64_t> GF2_359::mulPoly( const vector<uint64_t>& a, const vector<uint64_t>& b) {
     vector<uint64_t> r;
 
     for (size_t i = 0; i < b.size(); ++i) {

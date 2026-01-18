@@ -34,30 +34,14 @@ private:
     static void trim(vector<uint64_t>& a);
     static bool isOne(const vector<uint64_t>& a);
 
-    static vector<uint64_t> xorPoly(
-        const vector<uint64_t>& a,
-        const vector<uint64_t>& b
-    );
+    static vector<uint64_t> xorPoly( const vector<uint64_t>& a, const vector<uint64_t>& b);
 
-    static vector<uint64_t> shiftLeft(
-        const vector<uint64_t>& a,
-        int shift
-    );
+    static vector<uint64_t> shiftLeft( const vector<uint64_t>& a, int shift);
 
-    static void divMod(
-        const vector<uint64_t>& a,
-        const vector<uint64_t>& b,
-        vector<uint64_t>& q,
-        vector<uint64_t>& r
-    );
+    static void divMod( const vector<uint64_t>& a, const vector<uint64_t>& b, vector<uint64_t>& q, vector<uint64_t>& r);
 
-    static vector<uint64_t> mulPoly(
-        const vector<uint64_t>& a,
-        const vector<uint64_t>& b
-    );
+    static vector<uint64_t> mulPoly( const vector<uint64_t>& a, const vector<uint64_t>& b);
 
-    static vector<uint64_t> reduce(
-        const vector<uint64_t>& a
-    );
+    static vector<uint64_t> reduce( const vector<uint64_t>& a);
 };
 
