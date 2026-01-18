@@ -21,6 +21,8 @@ public:
 
     GF2_359 square() const;
     GF2_359 inverse() const;
+    GF2_359 pow(const GF2_359& exponent) const;
+    int trace() const;
 
     bool operator==(const GF2_359& other) const;
     bool operator!=(const GF2_359& other) const;
@@ -54,7 +56,7 @@ private:
         const vector<uint64_t>& b
     );
 
-    static vector<uint64_t> modP(
+    static vector<uint64_t> reduce(
         const vector<uint64_t>& a
     );
 };
