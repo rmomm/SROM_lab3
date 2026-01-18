@@ -26,13 +26,17 @@ void TestGF2m() {
     R = A.square();
     cout << "A^2 = " << R.toHex() << endl;
 
-    //GF2_359 A_pow_C = A.pow(C);
-    GF2_359 A_inv = A.inverse();
-    GF2_359 check = A * A_inv;
+    GF2_359 A_pow_C = A.pow(C);
+    cout << "A^C   = " << A_pow_C.toHex() << "\n";
 
-    //cout << "A^C   = " << A_pow_C.toHex() << "\n";
+    GF2_359 A_inv = A.inverse();
     cout << "A^-1  = " << A_inv.toHex() << "\n";
+
+    GF2_359 check = A * A_inv;
     cout << "A*A^-1= " << check.toHex() << "\n";
+
+    int tr = A.trace();
+    cout << "Tr(A) = " << tr << endl;
 
 
 
@@ -62,13 +66,13 @@ void BenchmarkGF2m() {
         cout << setw(15) << left << name << avg << " ns" << endl;
         };
 
-    cout << "\nAverage time per operation (GF2_359):\n";
+    cout << "\nAverage time per operation:\n";
     cout << "-------------------------------------\n";
 
     bench("add", [&]() { R = A + B; });
     bench("mul", [&]() { R = A * B; });
     bench("square", [&]() { R = A.square(); });
-    //bench("pow 5", [&]() { R = A.pow(5); });
+    bench("pow ", [&]() { R = A.pow(C); });
     bench("inverse", [&]() { R = A.inverse(); });
 
 }
