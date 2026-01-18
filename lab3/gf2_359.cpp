@@ -9,8 +9,7 @@ static const int P_TERMS[] = { 359, 18, 4, 2, 0 };
 
 GF2_359::GF2_359() {}
 
-GF2_359::GF2_359(const vector<uint64_t>& data)
-    : bits(data) {
+GF2_359::GF2_359(const vector<uint64_t>& data): bits(data) {
     trim(bits);
 }
 
@@ -26,10 +25,11 @@ GF2_359 GF2_359::one() {
 
 int GF2_359::degree(const vector<uint64_t>& a) {
     for (int i = (int)a.size() - 1; i >= 0; --i) {
-        if (a[i]) {
-            unsigned long idx;
-            _BitScanReverse64(&idx, a[i]);
-            return i * 64 + idx;
+        if (a[i] != 0) {
+            for (int b = 63; b >= 0; --b) {
+                if (a[i] & (1ULL << b)) 
+                    return i * 64 + b;
+            }
         }
     }
     return -1;
@@ -59,7 +59,8 @@ vector<uint64_t> GF2_359::shiftLeft(
     const vector<uint64_t>& a,
     int shift
 ) {
-    if (a.empty()) return {};
+    if (a.empty()) 
+        return {};
     int w = shift / 64;
     int b = shift % 64;
 
@@ -84,11 +85,13 @@ void GF2_359::divMod(
     q.clear();
 
     int db = degree(b);
-    if (db < 0) throw runtime_error("division by zero poly");
+    if (db < 0) 
+        throw runtime_error("division by zero poly");
 
     while (true) {
         int dr = degree(r);
-        if (dr < db) break;
+        if (dr < db) 
+            break;
 
         int shift = dr - db;
         r = xorPoly(r, shiftLeft(b, shift));
@@ -103,6 +106,15 @@ void GF2_359::divMod(
     trim(r);
 }
 
+static int lowestBit(uint64_t w) {
+    if (w == 0) 
+        return -1;
+    for (int b = 0; b < 64; ++b)
+        if (w & (1ULL << b)) 
+            return b;
+    return -1;
+}
+
 
 vector<uint64_t> GF2_359::mulPoly(
     const vector<uint64_t>& a,
@@ -113,17 +125,16 @@ vector<uint64_t> GF2_359::mulPoly(
     for (size_t i = 0; i < b.size(); ++i) {
         uint64_t w = b[i];
         while (w) {
-            unsigned long bit;
-            _BitScanForward64(&bit, w);
+            int bit = lowestBit(w);
             r = xorPoly(r, shiftLeft(a, (int)(i * 64 + bit)));
-            w &= w - 1;
+            w &= w - 1; 
         }
     }
     return r;
 }
 
 
-vector<uint64_t> GF2_359::modP(const vector<uint64_t>& a) {
+vector<uint64_t> GF2_359::reduce(const vector<uint64_t>& a) {
     vector<uint64_t> r = a;
     int d;
 
@@ -143,12 +154,13 @@ vector<uint64_t> GF2_359::modP(const vector<uint64_t>& a) {
 }
 
 
+
 GF2_359 GF2_359::operator+(const GF2_359& other) const {
     return GF2_359(xorPoly(bits, other.bits));
 }
 
 GF2_359 GF2_359::operator*(const GF2_359& other) const {
-    return GF2_359(modP(mulPoly(bits, other.bits)));
+    return GF2_359(reduce(mulPoly(bits, other.bits)));
 }
 
 
@@ -158,8 +170,7 @@ GF2_359 GF2_359::square() const {
     for (size_t i = 0; i < bits.size(); ++i) {
         uint64_t w = bits[i];
         while (w) {
-            unsigned long bit;
-            _BitScanForward64(&bit, w);
+            int bit = lowestBit(w);
             int pos = 2 * (int)(i * 64 + bit);
 
             int wi = pos / 64;
@@ -170,7 +181,7 @@ GF2_359 GF2_359::square() const {
             w &= w - 1;
         }
     }
-    return GF2_359(modP(r));
+    return GF2_359(reduce(r));
 }
 
 
@@ -201,8 +212,37 @@ GF2_359 GF2_359::inverse() const {
         t1 = t;
     }
 
-    return GF2_359(modP(t1));
+    return GF2_359(reduce(t1));
 }
+
+GF2_359 GF2_359::pow(const GF2_359& e) const {
+    GF2_359 result = GF2_359::one();
+    GF2_359 base = *this;
+
+    for (size_t i = 0; i < e.bits.size(); ++i) {
+        uint64_t w = e.bits[i];
+        for (int j = 0; j < 64; ++j) {
+            if (w & (1ULL << j))
+                result = result * base;
+            base = base.square();  
+        }
+    }
+    return result;
+}
+
+
+int GF2_359::trace() const {
+    GF2_359 t = *this;
+    GF2_359 res = t;
+
+    for (int i = 1; i < 359; ++i) {
+        t = t.square();
+        res = res + t;
+    }
+
+    return res.bits.empty() ? 0 : (res.bits[0] & 1);
+}
+
 
 
 GF2_359 GF2_359::fromHex(const string& hex) {
@@ -225,7 +265,7 @@ GF2_359 GF2_359::fromHex(const string& hex) {
             }
         }
     }
-    return GF2_359(modP(v));
+    return GF2_359(reduce(v));
 }
 
 string GF2_359::toHex() const {
