@@ -1,7 +1,6 @@
 #include "gf2_359.h"
 #include <sstream>
 #include <stdexcept>
-#include <intrin.h>
 
 using namespace std;
 
@@ -44,7 +43,7 @@ bool GF2_359::isOne(const vector<uint64_t>& a) {
     return a.size() == 1 && a[0] == 1;
 }
 
-vector<uint64_t> GF2_359::xorPoly( const vector<uint64_t>& a, const vector<uint64_t>& b) {
+vector<uint64_t> GF2_359::xorP( const vector<uint64_t>& a, const vector<uint64_t>& b) {
     vector<uint64_t> r(max(a.size(), b.size()), 0);
     for (size_t i = 0; i < a.size(); ++i) r[i] ^= a[i];
     for (size_t i = 0; i < b.size(); ++i) r[i] ^= b[i];
@@ -86,7 +85,7 @@ void GF2_359::divMod(const vector<uint64_t>& a, const vector<uint64_t>& b, vecto
             break;
 
         int shift = dr - db;
-        r = xorPoly(r, shiftLeft(b, shift));
+        r = xorP(r, shiftLeft(b, shift));
 
         int qi = shift / 64;
         if ((int)q.size() <= qi)
@@ -108,14 +107,14 @@ static int lowestBit(uint64_t w) {
 }
 
 
-vector<uint64_t> GF2_359::mulPoly( const vector<uint64_t>& a, const vector<uint64_t>& b) {
+vector<uint64_t> GF2_359::mulP( const vector<uint64_t>& a, const vector<uint64_t>& b) {
     vector<uint64_t> r;
 
     for (size_t i = 0; i < b.size(); ++i) {
         uint64_t w = b[i];
         while (w) {
             int bit = lowestBit(w);
-            r = xorPoly(r, shiftLeft(a, (int)(i * 64 + bit)));
+            r = xorP(r, shiftLeft(a, (int)(i * 64 + bit)));
             w &= w - 1; 
         }
     }
@@ -145,11 +144,11 @@ vector<uint64_t> GF2_359::reduce(const vector<uint64_t>& a) {
 
 
 GF2_359 GF2_359::operator+(const GF2_359& other) const {
-    return GF2_359(xorPoly(bits, other.bits));
+    return GF2_359(xorP(bits, other.bits));
 }
 
 GF2_359 GF2_359::operator*(const GF2_359& other) const {
-    return GF2_359(reduce(mulPoly(bits, other.bits)));
+    return GF2_359(reduce(mulP(bits, other.bits)));
 }
 
 
@@ -193,7 +192,7 @@ GF2_359 GF2_359::inverse() const {
         vector<uint64_t> q, r;
         divMod(r0, r1, q, r);
 
-        auto t = xorPoly(t0, mulPoly(q, t1));
+        auto t = xorP(t0, mulP(q, t1));
 
         r0 = r1;
         r1 = r;
@@ -222,14 +221,14 @@ GF2_359 GF2_359::pow(const GF2_359& e) const {
 
 int GF2_359::trace() const {
     GF2_359 t = *this;
-    GF2_359 res = t;
+    GF2_359 r = t;
 
     for (int i = 1; i < 359; ++i) {
         t = t.square();
-        res = res + t;
+        r = r + t;
     }
 
-    return res.bits.empty() ? 0 : (res.bits[0] & 1);
+    return r.bits.empty() ? 0 : (r.bits[0] & 1);
 }
 
 
@@ -258,7 +257,8 @@ GF2_359 GF2_359::fromHex(const string& hex) {
 }
 
 string GF2_359::toHex() const {
-    if (bits.empty()) return "0";
+    if (bits.empty()) 
+        return "0";
 
     stringstream ss;
     int d = degree(bits);
